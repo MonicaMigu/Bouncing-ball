@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Bouncing Ball</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" type="text/css" href="reset.css">
+    <link rel="stylesheet" type="text/css" media="screen" href="main.css" />
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.1/css/all.css" integrity="sha384-gfdkjb5BdAXd+lj+gudLWI+BXq4IuLW5IT+brZEZsLFm++aCMlF1V92rMkPaX4PP" crossorigin="anonymous">
+    <script src="jquery.min.js"></script>
+</head>
+
+<body>
+    <div class="container">
+        <div class="ball" id="ball"></div>
+        <div class="board" id="board"></div>
+        <div class="game-state">
+            <div class="game-over"><h1>GAME OVER</h1></div>
+            <div class="score"><h1>0</h1></div>
+            <div class="restart">
+                <a href=""><h2>重新整理</h2><i class="fas fa-redo-alt"></i></a>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>
+<script>
+    var speed = 5;
+    var mtop = 1;
+    var mleft = 1;
+    var bleft = 1;
+    var left_speed = speed + 2 * (0.5 - Math.random());
+    var top_speed = speed + 2 * (0.5 - Math.random());
+    var speedUp = 1;
+    var maxSpeed = 100;
+    var score = 0;
+    $(function () {
+        $('.game-over').hide();
+        $('.restart').hide();
+        const animate = setInterval(function () {
+            if (mtop < 0) {
+                top_speed *= -1;
+            }
+            mtop += top_speed;
+            if (mleft >= ($(".container").width() - 30) || mleft < 0) {
+                left_speed *= -1;
+            }
+            if (!(mtop < $('#board').offset().top - 30) && (mleft > $('#board').offset().left - 30) && (mleft < $('#board').offset().left + $('#board').width() + 30)) {
+                top_speed *= -1;
+                score += 10;
+                if (score != 0 && score % 50 == 0 && speed + (score / 10) * speedUp <= maxSpeed) {
+                    left_speed > 0 ? left_speed += speedUp : left_speed -= speedUp;
+                    top_speed > 0 ? top_speed += speedUp : top_speed -= speedUp;
+                }
+                if (score != 0 && score % 200 == 0) {
+                    $('#board').css({
+                        "width": $('#board').width() * 0.9 + 'px'
+                    })
+                }
+            }
+            if (mtop >= ($(".container").height()-30)) {
+                $('.game-over').show();
+                $('.restart').show();
+                clearInterval(animate);
+            }
+            $('.score>h1').text(score);
+            mleft += left_speed;
+            $("#ball").css({
+                "top": mtop + 'px',
+                "left": mleft + 'px'
+            });
+        }, 10);
+        $(".container").mousemove(function (e) {
+            bleft = e.pageX - ($(".board").width() / 2);
+            if(bleft < $(".container").offset().left) {
+                $("#board").css("left", $(".container").offset().left + 'px');
+            }else if((bleft + $(".board").width()) > ($(".container").offset().left + $(".container").width())){
+                $("#board").css("left", (($(".container").offset().left + $(".container").width()) - $(".board").width()) + 'px');
+            }else {
+                $("#board").css("left", bleft + 'px');
+            }
+        });
+        $('.restart').click(function () {
+            location.reload();
+        });
+    });
+</script>
